@@ -1,0 +1,20 @@
+name: llama-bench
+on: workflow_dispatch
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - run: |
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp
+          cd llama.cpp && cmake -B build -DGGML_NATIVE=ON -DLLAMA_CURL=OFF >/dev/null && cmake --build build -j4 --target llama-bench 2>&1 | tail -2
+      - run: |
+          mkdir m && cd m
+          curl -sL -o a.gguf https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+          curl -sL -o b.gguf https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf
+          curl -sL -o c.gguf https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+          ls -l
+      - run: |
+          for f in m/*.gguf; do echo "== $f"; ./llama.cpp/build/bin/llama-bench -m $f -t 4 -p 64 -n 128 -r 2; done 2>&1 | tee llama.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: llama, path: llama.txt}
