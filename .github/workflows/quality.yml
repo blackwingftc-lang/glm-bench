@@ -1,0 +1,22 @@
+name: quality
+on: workflow_dispatch
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - run: |
+          git clone --depth 1 https://github.com/ggml-org/llama.cpp
+          cd llama.cpp && cmake -B build -DGGML_NATIVE=ON -DLLAMA_CURL=OFF >/dev/null && cmake --build build -j4 --target llama-bench llama-cli 2>&1 | tail -2
+      - run: |
+          mkdir m && cd m
+          curl -sL -o q05.gguf https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+          curl -sL -o l1.gguf https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+          curl -sL -o l3.gguf https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+          curl -sL -o q3.gguf https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf
+          ls -l
+      - run: |
+          for f in m/*.gguf; do echo "== $f"; ./llama.cpp/build/bin/llama-bench -m $f -t 4 -p 64 -n 128 -r 2 | grep tg128; done 2>&1 | tee speed.txt
+          for f in m/*.gguf; do for p in "Q: What is 17*23? A:" "Write a Python function that returns the nth Fibonacci number.\ndef" "Translate to French: The weather is nice today. ->" "The capital of Australia is"; do echo "== $f | $p"; ./llama.cpp/build/bin/llama-cli -m $f -t 4 -no-cnv --temp 0 -n 60 -p "$(printf "$p")" 2>/dev/null | tail -n +1 | head -20; done; done 2>&1 | tee quality.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: quality, path: "*.txt"}
