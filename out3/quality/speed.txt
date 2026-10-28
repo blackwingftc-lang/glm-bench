@@ -1,8 +1,0 @@
-== m/l1.gguf
-| llama 1B Q4_K - Medium         | 762.81 MiB |     1.24 B | CPU        |       4 |           tg128 |         52.41 ± 0.37 |
-== m/l3.gguf
-| llama 3B Q4_K - Medium         |   1.87 GiB |     3.21 B | CPU        |       4 |           tg128 |         22.03 ± 0.22 |
-== m/q05.gguf
-| qwen2 1B Q4_K - Medium         | 462.96 MiB |   630.17 M | CPU        |       4 |           tg128 |         84.88 ± 0.08 |
-== m/q3.gguf
-| qwen2 3B Q4_K - Medium         |   1.95 GiB |     3.40 B | CPU        |       4 |           tg128 |         22.22 ± 0.16 |
