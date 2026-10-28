@@ -7,7 +7,7 @@ jobs:
     steps:
       - run: |
           git clone --depth 1 https://github.com/ggml-org/llama.cpp
-          cd llama.cpp && cmake -B build -DGGML_NATIVE=ON -DLLAMA_CURL=OFF >/dev/null && cmake --build build -j4 --target llama-bench llama-cli 2>&1 | tail -2
+          cd llama.cpp && cmake -B build -DGGML_NATIVE=ON -DLLAMA_CURL=OFF >/dev/null && cmake --build build -j4 --target llama-bench llama-completion 2>&1 | tail -2
       - run: |
           mkdir m && cd m
           curl -sL -o q05.gguf https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
@@ -17,6 +17,6 @@ jobs:
           ls -l
       - run: |
           for f in m/*.gguf; do echo "== $f"; ./llama.cpp/build/bin/llama-bench -m $f -t 4 -p 64 -n 128 -r 2 | grep tg128; done 2>&1 | tee speed.txt
-          for f in m/*.gguf; do for p in "Q: What is 17*23? A:" "Write a Python function that returns the nth Fibonacci number.\ndef" "Translate to French: The weather is nice today. ->" "The capital of Australia is"; do echo "== $f | $p"; ./llama.cpp/build/bin/llama-cli -m $f -t 4 -no-cnv --temp 0 -n 60 -p "$(printf "$p")" 2>/dev/null | tail -n +1 | head -20; done; done 2>&1 | tee quality.txt
+          for f in m/*.gguf; do for p in "Q: What is 17*23? A:" "Write a Python function that returns the nth Fibonacci number.\ndef" "Translate to French: The weather is nice today. ->" "The capital of Australia is"; do echo "== $f | $p"; ./llama.cpp/build/bin/llama-completion -m $f -t 4 --temp 0 -n 60 -no-cnv -p "$(printf "$p")" 2>&1 | grep -v -E "^(llama_|load|print_info|system_info|sampler|generate|main:|build|ggml|common)" | tail -8; done; done 2>&1 | tee quality.txt
       - uses: actions/upload-artifact@v4
         with: {name: quality, path: "*.txt"}

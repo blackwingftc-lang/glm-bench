@@ -1,0 +1,21 @@
+== m/a.gguf
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| llama 1B Q4_K - Medium         | 762.81 MiB |     1.24 B | CPU        |       4 |            pp64 |        164.34 ± 1.48 |
+| llama 1B Q4_K - Medium         | 762.81 MiB |     1.24 B | CPU        |       4 |           tg128 |         41.96 ± 0.14 |
+
+build: ac8e169 (1)
+== m/b.gguf
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| qwen2 1.5B Q4_K - Medium       |   1.04 GiB |     1.78 B | CPU        |       4 |            pp64 |        118.82 ± 1.36 |
+| qwen2 1.5B Q4_K - Medium       |   1.04 GiB |     1.78 B | CPU        |       4 |           tg128 |         34.24 ± 0.26 |
+
+build: ac8e169 (1)
+== m/c.gguf
+| model                          |       size |     params | backend    | threads |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | ------: | --------------: | -------------------: |
+| qwen2 1B Q4_K - Medium         | 462.96 MiB |   630.17 M | CPU        |       4 |            pp64 |        270.60 ± 1.25 |
+| qwen2 1B Q4_K - Medium         | 462.96 MiB |   630.17 M | CPU        |       4 |           tg128 |         66.32 ± 0.96 |
+
+build: ac8e169 (1)
